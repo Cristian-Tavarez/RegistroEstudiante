@@ -1,0 +1,71 @@
+﻿@page "/"
+@page "/estudiantes"
+@using RegistroEstudiante.Models
+@using RegistroEstudiante.Services
+@inject EstudiantesService service
+
+<h3>Listado de Estudiantes</h3>
+
+<div class="mb-3 d-flex">
+    <input class="form-control me-2"
+           placeholder="Buscar por nombre o matrícula"
+           @bind="textoBuscar"
+           @bind:event="oninput" />
+
+    <button class="btn btn-primary" @onclick="Buscar">
+        Buscar
+    </button>
+</div>
+
+<a class="btn btn-success mb-3" href="/estudiantes/create">
+    Nuevo Estudiante
+</a>
+
+@if (estudiantes.Count == 0)
+{
+    <p>No hay estudiantes registrados.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Matrícula</th>
+                <th>Carrera</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in estudiantes)
+            {
+                <tr>
+                    <td>@e.Nombres @e.Apellidos</td>
+                    <td>@e.Matricula</td>
+                    <td>@e.Carrera</td>
+                    <td>
+                        <a class="btn btn-sm btn-warning"
+                           href="/estudiantes/edit/@e.EstudianteId">
+                            Editar
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Estudiante> estudiantes = new();
+    private string textoBuscar = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        estudiantes = await service.ListarAsync();
+    }
+
+    private async Task Buscar()
+    {
+        estudiantes = await service.BuscarAsync(textoBuscar);
+    }
+}

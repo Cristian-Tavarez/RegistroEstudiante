@@ -1,0 +1,71 @@
+﻿@page "/estudiantes/create"
+@using RegistroEstudiante.Models
+@using RegistroEstudiante.Services
+@inject EstudiantesService service
+@inject NavigationManager nav
+
+<h3>Registrar Estudiante</h3>
+
+<EditForm EditContext="editContext"
+          OnValidSubmit="Guardar"
+          FormName="crearEstudiante">
+
+    <DataAnnotationsValidator />
+
+    <div class="mb-2">
+        <label>Nombres</label>
+        <InputText class="form-control"
+                   @bind-Value="estudiante.Nombres"
+                   @bind-Value:event="oninput" />
+        <ValidationMessage For="@(() => estudiante.Nombres)" />
+    </div>
+
+    <div class="mb-2">
+        <label>Apellidos</label>
+        <InputText class="form-control"
+                   @bind-Value="estudiante.Apellidos"
+                   @bind-Value:event="oninput" />
+        <ValidationMessage For="@(() => estudiante.Apellidos)" />
+    </div>
+
+    <div class="mb-2">
+        <label>Matrícula</label>
+        <InputText class="form-control"
+                   @bind-Value="estudiante.Matricula"
+                   @bind-Value:event="oninput" />
+        <ValidationMessage For="@(() => estudiante.Matricula)" />
+    </div>
+
+    <div class="mb-2">
+        <label>Carrera</label>
+        <InputText class="form-control"
+                   @bind-Value="estudiante.Carrera"
+                   @bind-Value:event="oninput" />
+        <ValidationMessage For="@(() => estudiante.Carrera)" />
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Guardar
+    </button>
+
+    <a class="btn btn-secondary ms-2" href="/estudiantes">
+        Cancelar
+    </a>
+
+</EditForm>
+
+@code {
+    private Estudiante estudiante = new();
+    private EditContext editContext;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(estudiante);
+    }
+
+    private async Task Guardar()
+    {
+        await service.GuardarAsync(estudiante);
+        nav.NavigateTo("/estudiantes");
+    }
+}

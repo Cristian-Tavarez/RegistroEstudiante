@@ -1,0 +1,52 @@
+﻿@page "/estudiantes/edit/{id:int}"
+@using RegistroEstudiante.Models
+@using RegistroEstudiante.Services
+@inject EstudiantesService service
+@inject NavigationManager nav
+
+<h3>Editar Estudiante</h3>
+
+<EditForm Model="estudiante" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="mb-2">
+        <label>Nombres</label>
+        <InputText class="form-control" @bind-Value="estudiante.Nombres" />
+    </div>
+
+    <div class="mb-2">
+        <label>Apellidos</label>
+        <InputText class="form-control" @bind-Value="estudiante.Apellidos" />
+    </div>
+
+    <div class="mb-2">
+        <label>Matrícula</label>
+        <InputText class="form-control" @bind-Value="estudiante.Matricula" />
+    </div>
+
+    <div class="mb-2">
+        <label>Carrera</label>
+        <InputText class="form-control" @bind-Value="estudiante.Carrera" />
+    </div>
+
+    <button class="btn btn-success">Guardar</button>
+    <a class="btn btn-secondary ms-2" href="/estudiantes">Cancelar</a>
+</EditForm>
+
+@code {
+    [Parameter] public int id { get; set; }
+    private Estudiante estudiante = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var e = await service.BuscarAsync(id);
+        if (e != null)
+            estudiante = e;
+    }
+
+    private async Task Guardar()
+    {
+        await service.GuardarAsync(estudiante);
+        nav.NavigateTo("/estudiantes", true);
+    }
+}
