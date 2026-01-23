@@ -1,71 +1,104 @@
 ﻿@page "/"
 @page "/estudiantes"
+@rendermode InteractiveServer
 @using RegistroEstudiante.Models
 @using RegistroEstudiante.Services
 @inject EstudiantesService service
+@inject NavigationManager nav
 
-<h3>Listado de Estudiantes</h3>
+<h3 class="mb-4">Registro de Estudiantes</h3>
 
-<div class="mb-3 d-flex">
-    <input class="form-control me-2"
-           placeholder="Buscar por nombre o matrícula"
-           @bind="textoBuscar"
-           @bind:event="oninput" />
+<div class="card shadow-sm">
+    <div class="card-body">
 
-    <button class="btn btn-primary" @onclick="Buscar">
-        Buscar
-    </button>
-</div>
+        <!-- Barra superior -->
+        <div class="d-flex justify-content-between mb-3">
+            <div class="w-50">
+                <input class="form-control"
+                       placeholder="Buscar por nombre o matrícula"
+                       @bind="filtro" />
+            </div>
 
-<a class="btn btn-success mb-3" href="/estudiantes/create">
-    Nuevo Estudiante
-</a>
+            <button class="btn btn-primary" @onclick="Crear">
+                Crear
+            </button>
 
-@if (estudiantes.Count == 0)
-{
-    <p>No hay estudiantes registrados.</p>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Matrícula</th>
-                <th>Carrera</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var e in estudiantes)
-            {
-                <tr>
-                    <td>@e.Nombres @e.Apellidos</td>
-                    <td>@e.Matricula</td>
-                    <td>@e.Carrera</td>
-                    <td>
-                        <a class="btn btn-sm btn-warning"
-                           href="/estudiantes/edit/@e.EstudianteId">
-                            Editar
-                        </a>
-                    </td>
-                </tr>
+            @code {
+                void Crear()
+                {
+                    nav.NavigateTo("/estudiantes/create");
+                }
             }
-        </tbody>
-    </table>
-}
+
+        </div>
+
+        <!-- Tabla -->
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Matrícula</th>
+                    <th>Carrera</th>
+                    <th class="text-center">Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in estudiantesFiltrados)
+                {
+                    <tr>
+                        <td>@e.EstudianteId</td>
+                        <td>@($"{e.Nombres} {e.Apellidos}")</td>
+                        <td>@e.Matricula</td>
+                        <td>@e.Carrera</td>
+                        <td class="text-center">
+                            <button class="btn btn-outline-primary btn-sm me-2"
+                                    @onclick="() => Editar(e.EstudianteId)">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button class="btn btn-outline-danger btn-sm"
+                                    @onclick="() => Eliminar(e.EstudianteId)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Footer -->
+        <div class="d-flex justify-content-between mt-3">
+            <span><strong>Cantidad:</strong> @estudiantesFiltrados.Count()</span>
+        </div>
+
+    </div>
+</div>
 
 @code {
     private List<Estudiante> estudiantes = new();
-    private string textoBuscar = "";
+    private string filtro = "";
 
     protected override async Task OnInitializedAsync()
     {
         estudiantes = await service.ListarAsync();
     }
 
-    private async Task Buscar()
+    private IEnumerable<Estudiante> estudiantesFiltrados =>
+        estudiantes.Where(e =>
+            string.IsNullOrWhiteSpace(filtro) ||
+            e.Nombres.Contains(filtro, StringComparison.OrdinalIgnoreCase) ||
+            e.Matricula.Contains(filtro, StringComparison.OrdinalIgnoreCase));
+
+    private void Editar(int id)
     {
-        estudiantes = await service.BuscarAsync(textoBuscar);
+        nav.NavigateTo($"/estudiantes/edit/{id}");
+    }
+
+    private async Task Eliminar(int id)
+    {
+        await service.EliminarAsync(id);
+        estudiantes = await service.ListarAsync();
     }
 }
+
