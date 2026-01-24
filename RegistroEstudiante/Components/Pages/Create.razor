@@ -1,71 +1,77 @@
 ﻿@page "/estudiantes/create"
+@rendermode InteractiveServer
 @using RegistroEstudiante.Models
 @using RegistroEstudiante.Services
 @inject EstudiantesService service
 @inject NavigationManager nav
 
-<h3>Registrar Estudiante</h3>
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header text-center">
+                <h4>Crear Estudiante</h4>
+            </div>
 
-<EditForm EditContext="editContext"
-          OnValidSubmit="Guardar"
-          FormName="crearEstudiante">
+            <div class="card-body">
+                <EditForm Model="estudiante"
+                          OnValidSubmit="Guardar"
+                          FormName="crearEstudiante">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" />
 
-    <DataAnnotationsValidator />
+                    <div class="mb-3">
+                        <label class="form-label">Nombres</label>
+                        <InputText class="form-control"
+                                   @bind-Value="estudiante.Nombres" />
+                    </div>
 
-    <div class="mb-2">
-        <label>Nombres</label>
-        <InputText class="form-control"
-                   @bind-Value="estudiante.Nombres"
-                   @bind-Value:event="oninput" />
-        <ValidationMessage For="@(() => estudiante.Nombres)" />
+                    <div class="mb-3">
+                        <label class="form-label">Apellidos</label>
+                        <InputText class="form-control"
+                                   @bind-Value="estudiante.Apellidos" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Matrícula</label>
+                        <InputText class="form-control"
+                                   @bind-Value="estudiante.Matricula" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Carrera</label>
+                        <InputText class="form-control"
+                                   @bind-Value="estudiante.Carrera" />
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                @onclick="Volver">
+                            ← Volver
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            💾 Guardar
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-2">
-        <label>Apellidos</label>
-        <InputText class="form-control"
-                   @bind-Value="estudiante.Apellidos"
-                   @bind-Value:event="oninput" />
-        <ValidationMessage For="@(() => estudiante.Apellidos)" />
-    </div>
-
-    <div class="mb-2">
-        <label>Matrícula</label>
-        <InputText class="form-control"
-                   @bind-Value="estudiante.Matricula"
-                   @bind-Value:event="oninput" />
-        <ValidationMessage For="@(() => estudiante.Matricula)" />
-    </div>
-
-    <div class="mb-2">
-        <label>Carrera</label>
-        <InputText class="form-control"
-                   @bind-Value="estudiante.Carrera"
-                   @bind-Value:event="oninput" />
-        <ValidationMessage For="@(() => estudiante.Carrera)" />
-    </div>
-
-    <button type="submit" class="btn btn-success">
-        Guardar
-    </button>
-
-    <a class="btn btn-secondary ms-2" href="/estudiantes">
-        Cancelar
-    </a>
-
-</EditForm>
+</div>
 
 @code {
     private Estudiante estudiante = new();
-    private EditContext editContext;
-
-    protected override void OnInitialized()
-    {
-        editContext = new EditContext(estudiante);
-    }
 
     private async Task Guardar()
     {
         await service.GuardarAsync(estudiante);
+        nav.NavigateTo("/estudiantes");
+    }
+
+    private void Volver()
+    {
         nav.NavigateTo("/estudiantes");
     }
 }
