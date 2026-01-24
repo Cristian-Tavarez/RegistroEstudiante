@@ -1,0 +1,83 @@
+﻿@page "/asignaturas"
+@rendermode InteractiveServer
+@using RegistroEstudiante.Models
+@using RegistroEstudiante.Services
+@inject AsignaturasService service
+@inject NavigationManager nav
+
+<h3 class="mb-3">Registro de Asignaturas</h3>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between mb-3">
+            <input class="form-control w-50"
+                   placeholder="Buscar por nombre o código"
+                   @bind="filtro" />
+
+            <a class="btn btn-primary"
+               href="/asignaturas/create">
+                ➕ Crear
+            </a>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Aula</th>
+                    <th>Créditos</th>
+                    <th class="text-center">Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in asignaturasFiltradas)
+                {
+                    <tr>
+                        <td>@a.AsignaturaId</td>
+                        <td>@a.Codigo</td>
+                        <td>@a.Nombre</td>
+                        <td>@a.Aula</td>
+                        <td>@a.Creditos</td>
+                        <td class="text-center">
+                            <a class="btn btn-outline-primary btn-sm me-1"
+                               href="/asignaturas/edit/@a.AsignaturaId">
+                                ✏️ Editar
+                            </a>
+
+                            <a class="btn btn-outline-danger btn-sm"
+                               href="/asignaturas/edit/@a.AsignaturaId">
+                                🗑 Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="mt-2 fw-bold">
+            Cantidad: @asignaturasFiltradas.Count
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private List<Asignatura> asignaturas = new();
+    private string filtro = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        asignaturas = await service.ListarAsync();
+    }
+
+    private List<Asignatura> asignaturasFiltradas =>
+        asignaturas
+            .Where(a =>
+                string.IsNullOrWhiteSpace(filtro) ||
+                a.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase) ||
+                a.Codigo.Contains(filtro, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+}
