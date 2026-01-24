@@ -10,7 +10,10 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddDbContext<EstudiantesContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+builder.Services.AddScoped<AsignaturasService>();
 
 // 🔴 ESTA LÍNEA FALTABA
 builder.Services.AddScoped<EstudiantesService>();
@@ -34,3 +37,6 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
+
+builder.Services.AddScoped<AsignaturasService>();
+
