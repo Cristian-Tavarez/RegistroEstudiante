@@ -1,0 +1,109 @@
+﻿@page "/asignaturas/tipospuntos/edit/{Id:int}"
+@rendermode InteractiveServer
+@using RegistroEstudiante.Models
+@using RegistroEstudiante.Services
+@inject TiposPuntosService service
+@inject NavigationManager nav
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header text-center">
+                <h4>Editar Tipo de Punto</h4>
+            </div>
+
+            <div class="card-body">
+                @if (tipo == null)
+                {
+                    <p class="text-danger text-center">
+                        Tipo de Punto no encontrado
+                    </p>
+                }
+                else
+                {
+                    <EditForm Model="tipo"
+                              OnValidSubmit="Guardar"
+                              FormName="editarTipoPunto">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger" />
+
+                        <InputText class="form-control mb-2"
+                                   @bind-Value="tipo.Nombre"
+                                   placeholder="Nombre" />
+
+                        <InputText class="form-control mb-2"
+                                   @bind-Value="tipo.Descripcion"
+                                   placeholder="Descripción" />
+
+                        <InputNumber class="form-control mb-2"
+                                     @bind-Value="tipo.ValorPuntos" />
+
+                        <InputText class="form-control mb-2"
+                                   @bind-Value="tipo.Color"
+                                   placeholder="Color" />
+
+                        <InputText class="form-control mb-2"
+                                   @bind-Value="tipo.Icono"
+                                   placeholder="Icono" />
+
+                        <InputCheckbox class="form-check-input mb-3"
+                                       @bind-Value="tipo.Activo" />
+                        <label class="form-check-label ms-1">
+                            Activo
+                        </label>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    @onclick="Volver">
+                                ← Volver
+                            </button>
+
+                            <div>
+                                <button type="submit"
+                                        class="btn btn-primary me-2">
+                                    💾 Guardar
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-danger"
+                                        @onclick="Eliminar">
+                                    🗑 Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </EditForm>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    TipoPunto? tipo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tipo = await service.BuscarAsync(Id);
+    }
+
+    async Task Guardar()
+    {
+        await service.ActualizarAsync(tipo!);
+        nav.NavigateTo("/asignaturas/tipospuntos");
+    }
+
+    async Task Eliminar()
+    {
+        await service.EliminarAsync(Id);
+        nav.NavigateTo("/asignaturas/tipospuntos");
+    }
+
+    void Volver()
+    {
+        nav.NavigateTo("/asignaturas/tipospuntos");
+    }
+}

@@ -1,0 +1,108 @@
+﻿@page "/asignaturas/tipospuntos/create"
+@rendermode InteractiveServer
+@using RegistroEstudiante.Models
+@using RegistroEstudiante.Services
+@inject TiposPuntosService service
+@inject NavigationManager nav
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header text-center">
+                <h4>Nuevo Tipo de Punto</h4>
+            </div>
+
+            <div class="card-body">
+
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <div class="alert alert-danger">
+                        @error
+                    </div>
+                }
+
+                <EditForm Model="tipo"
+                          OnValidSubmit="Guardar"
+                          FormName="crearTipoPunto">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <InputText class="form-control"
+                                   @bind-Value="tipo.Nombre" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <InputText class="form-control"
+                                   @bind-Value="tipo.Descripcion" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Valor de Puntos</label>
+                        <InputNumber class="form-control"
+                                     @bind-Value="tipo.ValorPuntos" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Color</label>
+                        <InputText class="form-control"
+                                   @bind-Value="tipo.Color" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Ícono</label>
+                        <InputText class="form-control"
+                                   @bind-Value="tipo.Icono" />
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <InputCheckbox class="form-check-input"
+                                       @bind-Value="tipo.Activo" />
+                        <label class="form-check-label">
+                            Activo
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                @onclick="Volver">
+                            ← Volver
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            💾 Guardar
+                        </button>
+                    </div>
+                </EditForm>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private TipoPunto tipo = new();
+    private string? error;
+
+    private async Task Guardar()
+    {
+        try
+        {
+            await service.GuardarAsync(tipo);
+            nav.NavigateTo("/asignaturas/tipospuntos");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+    private void Volver()
+    {
+        nav.NavigateTo("/asignaturas/tipospuntos");
+    }
+}
